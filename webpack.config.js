@@ -1,31 +1,18 @@
-var path = require('path')
-var webpack = require('webpack')
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var path = require('path');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
-//entry: './src/main.js',
 	entry:'./src/lib/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'vue-photo-preview.js',
-    library: 'vue-photo-preview',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    filename: 'index.js',
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: {
-          loaders: {
-          	css: ExtractTextPlugin.extract({
-                use: ['css-loader', 'autoprefixer-loader'],
-                fallback: 'vue-style-loader',
-            })
-          }
-          // other vue-loader options go here
-        }
       },
       {
         test: /\.js$/,
@@ -35,8 +22,8 @@ module.exports = {
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
-            use: ['css-loader?minimize', 'autoprefixer-loader','resolve-url-loader'],
-            fallback: 'style-loader',
+          use: ['css-loader?minimize','resolve-url-loader'],
+          fallback: 'style-loader',
         })
       },
       {
@@ -49,42 +36,13 @@ module.exports = {
       }
     ]
   },
-  plugins:[
-      new ExtractTextPlugin('skin.css'),
+  plugins: [
+    new VueLoaderPlugin(), // vue加载器
+    new ExtractTextPlugin('skin.css'),
   ],
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    }
-  },
   devServer: {
     historyApiFallback: true,
-    noInfo: true,
-    overlay: true
+    writeToDisk: true,
   },
-  performance: {
-    hints: false
-  },
-  devtool: '#eval-source-map'
-}
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
+  devtool: 'source-map'
 }
